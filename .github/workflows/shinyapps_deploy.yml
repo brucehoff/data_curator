@@ -1,0 +1,72 @@
+# Workflow derived from https://github.com/r-lib/actions/tree/master/examples
+# Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
+
+name: shiny-deploy
+
+on:
+  push:
+    branches:
+      - main
+      - release
+
+jobs:
+  shiny-deploy:
+    runs-on: ubuntu-latest
+    env:
+      CONDA_ENV_NAME: "conda_env"
+#      GITHUB_PAT: ${{ secrets.PAT }}
+    steps:
+      - name: Install libcurl
+        run: sudo apt-get install -y libcurl4-openssl-dev
+ 
+      - uses: actions/checkout@v2
+
+      - uses: r-lib/actions/setup-pandoc@v1
+
+      - uses: r-lib/actions/setup-r@v1
+        with:
+          use-public-rspm: true
+
+      - uses: r-lib/actions/setup-renv@v1
+
+      - name: Install rsconnect
+        run: install.packages(c("rsconnect", "read_yaml", "reticulate"))
+        shell: Rscript {0}
+        
+      - name: Conda
+        run: |
+          environment<-read_yaml("environment.yml")
+          envname<-Sys.env("CONDA_ENV_NAME")
+          # expression to find pip
+          pip_index <- ("pip"==sapply(environment, function(x) names(x)))
+          # the items in 'dependencies' NOT under 'pip'
+          packages <- unlist(d[which(!pip_index)])
+          # add in the items under 'pip'
+          packages <- c(packages, d[which(pip_index)][[1]]$pip)
+          conda_create(
+           envname = envname,
+           packages = packages,
+           forge = TRUE,
+           channel = environment$channels
+          )
+        shell: Rscript {0}
+        
+      - name: Create config file
+        run: |
+          echo "CLIENT_ID: ${{ secrets.OAUTH_CLIENT_ID }}" > confg.yml    
+          echo "CLIENT_ID: ${{ secrets.OAUTH_CLIENT_SECRET }}" >> confg.yml
+          echo "CONDA_ENV_NAME: ${{ env.CONDA_ENV_NAME }}" >> confg.yml
+          # TODO Autogenerate the app' name at the end of the URL:
+          echo "APP_URL: https://sagebio.shinyapps.io/data_curator-staging" >> confg.yml
+ 
+      - name: Authorize and deploy app
+        run: |
+          branch<-Sys.getenv("GITHUB_REF_NAME")
+          repo<-Sys.getenv("GITHUB_REPOSITORY")
+          appName<-strsplit(repo, "/")[[1]][2]
+          if (!startsWith(branch, "release")) {
+             appName = paste(appName, "staging", sep="-")
+          }
+          rsconnect::setAccountInfo("${{ secrets.RSCONNECT_USER }}", "${{ secrets.RSCONNECT_TOKEN }}", "${{ secrets.RSCONNECT_SECRET }}")
+          rsconnect::deployApp(appName = appName)
+        shell: Rscript {0}
