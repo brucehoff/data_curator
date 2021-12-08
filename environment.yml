@@ -1,5 +1,6 @@
 channels:
   - defaults
+  - bioconda
 dependencies:
   - _libgcc_mutex=0.1
   - ca-certificates=2020.6.24=0
