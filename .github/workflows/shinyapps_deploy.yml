@@ -30,13 +30,15 @@ jobs:
       - uses: r-lib/actions/setup-renv@v1
 
       - name: Install rsconnect
-        run: install.packages(c("rsconnect", "read_yaml", "reticulate"))
         shell: Rscript {0}
+        run: install.packages(c("rsconnect", "read_yaml", "reticulate"))
         
       - name: Conda
+        shell: Rscript {0}
         run: |
+          import(read_yaml)
           environment<-read_yaml("environment.yml")
-          envname<-Sys.env("CONDA_ENV_NAME")
+          env_name<-Sys.env("CONDA_ENV_NAME")
           # expression to find pip
           pip_index <- ("pip"==sapply(environment, function(x) names(x)))
           # the items in 'dependencies' NOT under 'pip'
@@ -44,12 +46,11 @@ jobs:
           # add in the items under 'pip'
           packages <- c(packages, d[which(pip_index)][[1]]$pip)
           conda_create(
-           envname = envname,
+           envname = env_name,
            packages = packages,
            forge = TRUE,
            channel = environment$channels
           )
-        shell: Rscript {0}
         
       - name: Create config file
         run: |
@@ -60,6 +61,7 @@ jobs:
           echo "APP_URL: https://sagebio.shinyapps.io/data_curator-staging" >> confg.yml
  
       - name: Authorize and deploy app
+        shell: Rscript {0}
         run: |
           branch<-Sys.getenv("GITHUB_REF_NAME")
           repo<-Sys.getenv("GITHUB_REPOSITORY")
@@ -69,4 +71,4 @@ jobs:
           }
           rsconnect::setAccountInfo("${{ secrets.RSCONNECT_USER }}", "${{ secrets.RSCONNECT_TOKEN }}", "${{ secrets.RSCONNECT_SECRET }}")
           rsconnect::deployApp(appName = appName)
-        shell: Rscript {0}
+ 
