@@ -40,7 +40,7 @@ jobs:
           library(rsconnect)
           library(reticulate)
           environment<-read_yaml("environment.yml")
-          env_name<-Sys.env("CONDA_ENV_NAME")
+          env_name<-Sys.getenv("CONDA_ENV_NAME")
           # expression to find pip
           pip_index <- ("pip"==sapply(environment, function(x) names(x)))
           # the items in 'dependencies' NOT under 'pip'
