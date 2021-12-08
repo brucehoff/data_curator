@@ -36,9 +36,9 @@ jobs:
       - name: Conda
         shell: Rscript {0}
         run: |
-          import(yaml)
-          import(rsconnect)
-          import(reticulate)
+          library(yaml)
+          library(rsconnect)
+          library(reticulate)
           environment<-read_yaml("environment.yml")
           env_name<-Sys.env("CONDA_ENV_NAME")
           # expression to find pip
