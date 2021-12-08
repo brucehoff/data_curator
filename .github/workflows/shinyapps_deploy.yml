@@ -37,6 +37,8 @@ jobs:
         shell: Rscript {0}
         run: |
           import(yaml)
+          import(rsconnect)
+          import(reticulate)
           environment<-read_yaml("environment.yml")
           env_name<-Sys.env("CONDA_ENV_NAME")
           # expression to find pip
@@ -55,7 +57,7 @@ jobs:
       - name: Create config file
         run: |
           echo "CLIENT_ID: ${{ secrets.OAUTH_CLIENT_ID }}" > confg.yml    
-          echo "CLIENT_ID: ${{ secrets.OAUTH_CLIENT_SECRET }}" >> confg.yml
+          echo "CLIENT_SECRET: ${{ secrets.OAUTH_CLIENT_SECRET }}" >> confg.yml
           echo "CONDA_ENV_NAME: ${{ env.CONDA_ENV_NAME }}" >> confg.yml
           # TODO Autogenerate the app' name at the end of the URL:
           echo "APP_URL: https://sagebio.shinyapps.io/data_curator-staging" >> confg.yml
