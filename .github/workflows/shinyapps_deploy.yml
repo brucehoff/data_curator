@@ -31,12 +31,12 @@ jobs:
 
       - name: Install rsconnect
         shell: Rscript {0}
-        run: install.packages(c("rsconnect", "read_yaml", "reticulate"))
+        run: install.packages(c("rsconnect", "yaml", "reticulate"))
         
       - name: Conda
         shell: Rscript {0}
         run: |
-          import(read_yaml)
+          import(yaml)
           environment<-read_yaml("environment.yml")
           env_name<-Sys.env("CONDA_ENV_NAME")
           # expression to find pip
