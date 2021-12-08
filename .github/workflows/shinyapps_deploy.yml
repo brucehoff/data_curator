@@ -6,7 +6,7 @@ name: shiny-deploy
 on:
   push:
     branches:
-      - main
+      - shiny-server-main
       - release
 
 jobs:
