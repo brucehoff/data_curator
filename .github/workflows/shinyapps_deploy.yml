@@ -57,7 +57,7 @@ jobs:
           )
           message("About to call 'py_install'")
           use_condaenv(condaenv=env_name)
-          py_install("tabletext")
+          py_install("tabletext", pip=TRUE)
           py_install("schematicpy", pip=TRUE)
           message("Done with 'py_install'")
         
