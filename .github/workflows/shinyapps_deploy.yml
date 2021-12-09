@@ -33,7 +33,7 @@ jobs:
         shell: Rscript {0}
         run: install.packages(c("rsconnect", "yaml", "reticulate"))
         
-      - name: Conda
+      - name: Virtual Environment
         shell: Rscript {0}
         run: |
           library(yaml)
@@ -45,6 +45,10 @@ jobs:
           pip_index <- ("pip"==sapply(dependencies, function(x) names(x)))
           # the items in 'dependencies' NOT under 'pip'
           packages <- unlist(dependencies[which(!pip_index)])
+          #
+          # repl = with ==
+          packages <- gsub("=","==", packages)
+          #
           # add in the items under 'pip'
           # packages <- c(packages, dependencies[which(pip_index)][[1]]$pip)
           env_name<-Sys.getenv("CONDA_ENV_NAME")
@@ -55,13 +59,13 @@ jobs:
           #  channel = environment$channels
           # )
           # use_condaenv(condaenv=env_name)
+          packages <- c(packages, "schematicpy")
           virtualenv_create(
             envname = env_name,
             packages = packages
           )
           use_virtualenv(env_name)
-          py_install("tabletext", pip=TRUE)
-          py_install("schematicpy", pip=TRUE)
+          # py_install("schematicpy", pip=TRUE)
         
       - name: Authorize and deploy app
         shell: Rscript {0}

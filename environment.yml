@@ -84,7 +84,7 @@ dependencies:
     - secretstorage==2.3.1
     - six==1.15.0
     - synapseclient==2.1.0
-#    - tabletext==0.1
+    - tabletext==0.1
     - uritemplate==3.0.1
     - urllib3==1.25.9
     - wrapt==1.12.1
