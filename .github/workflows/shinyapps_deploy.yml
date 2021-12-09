@@ -7,7 +7,7 @@ on:
   push:
     branches:
       - shiny-server-main
-      - release
+      - release*
 
 jobs:
   shiny-deploy:
@@ -63,11 +63,11 @@ jobs:
         
       - name: Create config file
         run: |
-          echo "CLIENT_ID: ${{ secrets.OAUTH_CLIENT_ID }}" > confg.yml    
-          echo "CLIENT_SECRET: ${{ secrets.OAUTH_CLIENT_SECRET }}" >> confg.yml
-          echo "CONDA_ENV_NAME: ${{ env.CONDA_ENV_NAME }}" >> confg.yml
+          echo "CLIENT_ID: ${{ secrets.OAUTH_CLIENT_ID }}" > confg.yaml    
+          echo "CLIENT_SECRET: ${{ secrets.OAUTH_CLIENT_SECRET }}" >> confg.yaml
+          echo "CONDA_ENV_NAME: ${{ env.CONDA_ENV_NAME }}" >> confg.yaml
           # TODO Autogenerate the app' name at the end of the URL:
-          echo "APP_URL: https://sagebio.shinyapps.io/data_curator-staging" >> confg.yml
+          echo "APP_URL: https://sagebio.shinyapps.io/data_curator-staging" >> confg.yaml
  
       - name: Authorize and deploy app
         shell: Rscript {0}
