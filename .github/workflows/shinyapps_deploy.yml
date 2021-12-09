@@ -46,7 +46,7 @@ jobs:
           # the items in 'dependencies' NOT under 'pip'
           packages <- unlist(dependencies[which(!pip_index)])
           # add in the items under 'pip'
-          packages <- c(packages, dependencies[which(pip_index)][[1]]$pip)
+          # packages <- c(packages, dependencies[which(pip_index)][[1]]$pip)
           env_name<-Sys.getenv("CONDA_ENV_NAME")
           conda_create(
            envname = env_name,
