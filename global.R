@@ -21,6 +21,8 @@ suppressPackageStartupMessages({
   library(shinydashboardPlus)
 })
 
+message("In global.R")
+
 has_auth_code <- function(params) {
   # params is a list object containing the parsed URL parameters. Return TRUE if
   # based on these parameters, it looks like auth code is present that we can
@@ -44,6 +46,8 @@ if (interactive()) {
 }
 
 conda_name <- toString(oauth_client$CONDA_ENV_NAME)
+
+message(sprintf("In global.R.  conda_name: %s", conda_name))
 
 if (is.null(client_id)) stop("config.yaml is missing CLIENT_ID")
 if (is.null(client_secret)) stop("config.yaml is missing CLIENT_SECRET")
@@ -87,7 +91,9 @@ scope <- "openid view download modify"
 
 # Activate conda env
 # Don't necessarily have to set `RETICULATE_PYTHON` env variable
+message(sprintf("In global.R. about to call use_condaenv( %s )", conda_name))
 reticulate::use_condaenv(conda_name)
+message(sprintf("In global.R. Done calling use_condaenv( %s )", conda_name))
 
 # Import functions/modules
 source_files <- list.files(c("functions", "modules"), pattern = "*\\.R$", recursive = TRUE, full.names = TRUE)
