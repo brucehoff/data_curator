@@ -48,27 +48,16 @@ jobs:
           # add in the items under 'pip'
           # packages <- c(packages, dependencies[which(pip_index)][[1]]$pip)
           env_name<-Sys.getenv("CONDA_ENV_NAME")
-          message("About to call 'conda_create'")
           conda_create(
            envname = env_name,
            packages = packages,
            forge = TRUE,
            channel = environment$channels
           )
-          message("About to call 'py_install'")
           use_condaenv(condaenv=env_name)
           py_install("tabletext", pip=TRUE)
           py_install("schematicpy", pip=TRUE)
-          message("Done with 'py_install'")
         
-      - name: Create config file
-        run: |
-          echo "CLIENT_ID: ${{ secrets.OAUTH_CLIENT_ID }}" > confg.yaml    
-          echo "CLIENT_SECRET: ${{ secrets.OAUTH_CLIENT_SECRET }}" >> confg.yaml
-          echo "CONDA_ENV_NAME: ${{ env.CONDA_ENV_NAME }}" >> confg.yaml
-          # TODO Autogenerate the app' name at the end of the URL:
-          echo "APP_URL: https://sagebio.shinyapps.io/data_curator-staging" >> confg.yaml
- 
       - name: Authorize and deploy app
         shell: Rscript {0}
         run: |
@@ -76,8 +65,24 @@ jobs:
           repo<-Sys.getenv("GITHUB_REPOSITORY")
           appName<-strsplit(repo, "/")[[1]][2]
           if (!startsWith(branch, "release")) {
-             appName = paste(appName, "staging", sep="-")
+             appName <- paste(appName, "staging", sep="-")
           }
-          rsconnect::setAccountInfo("${{ secrets.RSCONNECT_USER }}", "${{ secrets.RSCONNECT_TOKEN }}", "${{ secrets.RSCONNECT_SECRET }}")
+          rsConnectUser <-"${{ secrets.RSCONNECT_USER }}"
+          rsConnectToken <- "${{ secrets.RSCONNECT_TOKEN }}"
+          rsConnectSecret <- "${{ secrets.RSCONNECT_SECRET }}"
+          
+          # create config file
+          config <- "CLIENT_ID: ${{ secrets.OAUTH_CLIENT_ID }}"
+          config <- c(config, "CLIENT_SECRET: ${{ secrets.OAUTH_CLIENT_SECRET }}")
+          config <- c(config, "CONDA_ENV_NAME: ${{ env.CONDA_ENV_NAME }}")
+          appUrl<- sprintf("https://%s.shinyapps.io/%s", rsConnectUser, appName)
+          config <- c(config, sprintf("APP_URL: %s", appUrl))
+          
+          configFileConn<-file("confg.yaml")
+          tryCatch(
+             writeLines(config, configFileConn),
+             finally=close(configFileConn)
+          )
+          rsconnect::setAccountInfo(rsConnectUser, rsConnectToken, rsConnectSecret)
           rsconnect::deployApp(appName = appName)
  
