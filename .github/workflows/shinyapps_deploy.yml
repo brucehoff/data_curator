@@ -13,8 +13,8 @@ jobs:
   shiny-deploy:
     runs-on: ubuntu-latest
     env:
-      CONDA_ENV_NAME: "conda_env"
-#      GITHUB_PAT: ${{ secrets.PAT }}
+      CONDA_ENV_NAME: "virtual_env"
+
     steps:
       - name: Install libcurl
         run: sudo apt-get install -y libcurl4-openssl-dev
@@ -48,13 +48,18 @@ jobs:
           # add in the items under 'pip'
           # packages <- c(packages, dependencies[which(pip_index)][[1]]$pip)
           env_name<-Sys.getenv("CONDA_ENV_NAME")
-          conda_create(
-           envname = env_name,
-           packages = packages,
-           forge = TRUE,
-           channel = environment$channels
+          # conda_create(
+          #  envname = env_name,
+          #  packages = packages,
+          #  forge = TRUE,
+          #  channel = environment$channels
+          # )
+          # use_condaenv(condaenv=env_name)
+          virtualenv_create(
+            envname = env_name,
+            packages = packages
           )
-          use_condaenv(condaenv=env_name)
+          use_virtualenv(env_name)
           py_install("tabletext", pip=TRUE)
           py_install("schematicpy", pip=TRUE)
         

@@ -91,9 +91,13 @@ scope <- "openid view download modify"
 
 # Activate conda env
 # Don't necessarily have to set `RETICULATE_PYTHON` env variable
-message(sprintf("In global.R. about to call use_condaenv( %s )", conda_name))
-reticulate::use_condaenv(conda_name)
-message(sprintf("In global.R. Done calling use_condaenv( %s )", conda_name))
+message(sprintf("In global.R. about to call use_virtualenv( %s )", conda_name))
+#reticulate::use_condaenv(conda_name) #  <<<< this line breaks
+# From 
+# https://community.rstudio.com/t/how-to-use-conda-environment-in-shinyapps-io/18630/2
+# "conda is not available on shinyapps.io You should be able to use use_virtualenv though."
+use_virtualenv(conda_name)
+message(sprintf("In global.R. Done calling use_virtualenv( %s )", conda_name))
 
 # Import functions/modules
 source_files <- list.files(c("functions", "modules"), pattern = "*\\.R$", recursive = TRUE, full.names = TRUE)
