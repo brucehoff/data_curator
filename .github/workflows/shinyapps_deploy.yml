@@ -48,14 +48,17 @@ jobs:
           # add in the items under 'pip'
           # packages <- c(packages, dependencies[which(pip_index)][[1]]$pip)
           env_name<-Sys.getenv("CONDA_ENV_NAME")
+          message("About to call 'conda_create'")
           conda_create(
            envname = env_name,
            packages = packages,
            forge = TRUE,
            channel = environment$channels
           )
+          message("About to call 'py_install'")
           py_install("schematicpy")
           py_install("tabletext")
+          message("Done with 'py_install'")
         
       - name: Create config file
         run: |
